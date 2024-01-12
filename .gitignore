@@ -1,6 +1,7 @@
 tools/
 projects/[1-9][0-9]
-projects/0[4-9]
+projects/0[5-9]
 *.cmp
 *.out
 *.tst
+*.hack
