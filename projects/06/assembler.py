@@ -116,7 +116,7 @@ def assemble(file_path,output_file):
 			if is_blank(line) or is_comment(line):
 				continue
 			if is_label(line):
-				goto_map[line.replace('(','').replace(')','').strip()] = abs_index
+				goto_map[line.strip('(').strip(')').strip()] = abs_index
 				continue
 			abs_index+=1
 
