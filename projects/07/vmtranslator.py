@@ -51,9 +51,8 @@ def logical_op(c, ABS):
   goto_label = '@' + label
   ji = 'D;' + c
   ll = '(' + label + ')'
-  instruction_buffer = ['@SP', 'M=M-1', '@SP', 'A=M', 'D=M', '@SP', 'M=M-1', '@SP', 'A=M', 'A=M', 'D=A-D', '@SP',
+  return ['@SP', 'M=M-1', '@SP', 'A=M', 'D=M', '@SP', 'M=M-1', '@SP', 'A=M', 'A=M', 'D=A-D', '@SP',
                           'A=M', 'M=-1', goto_label, ji, '@SP', 'A=M', 'M=0', ll, '@SP', 'M=M+1']
-  return instruction_buffer
 
 def translate(file_path, output_file, generate_comments):
   ABS = 1
@@ -122,7 +121,7 @@ def main():
   args = parser.parse_args()
   file_path = args.f
   output_file = args.o
-  generate_comments = True if args.comments else False
+  generate_comments = args.comments
 
   translate(file_path, output_file, generate_comments)
 
