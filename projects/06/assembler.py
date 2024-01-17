@@ -161,9 +161,9 @@ def main():
   parser.add_argument('--f', help='File to assemble')
   parser.add_argument('--o', help='Name of output file')
 
-  arg_dict = vars(parser.parse_args())
-  file_path = arg_dict['f']
-  output_file = arg_dict['o']
+  arg_dict = parser.parse_args()
+  file_path = arg_dict.f
+  output_file = arg_dict.o
 
   assemble(file_path,output_file)
 
