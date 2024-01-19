@@ -1,6 +1,6 @@
 tools/
 projects/[1-9][0-9]
-projects/0[8-9]
+projects/0[9-9]
 *.cmp
 *.out
 *.tst
@@ -10,3 +10,4 @@ add/
 max/
 pong/
 rect/
+*.html
