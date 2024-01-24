@@ -68,7 +68,7 @@ class CompilationEngine:
   def process_token(self, expected_token):
     if self.current_token != expected_token:
       raise Exception(f'Token {expected_token} did not match current token {self.current_token}')
-    self.buffer += [f'<{self.token_type}> {self.current_token} </{self.token_type}>']
+    self.buffer.append(f'<{self.token_type}> {self.current_token} </{self.token_type}>')
     self.tokenizer.advance()
 
   def process_type(self, expected_type: LexicalLabels):
@@ -233,7 +233,7 @@ class CompilationEngine:
     self.compile_term()
     while self.current_token in ['+', '-', '*', '/', '&', '|', '<', '>', '=']:
       op = self.current_token if self.current_token not in OP_CONV else OP_CONV[self.current_token]
-      self.buffer += [f'<symbol> {op} </symbol>']
+      self.buffer.append(f'<symbol> {op} </symbol>')
       self.tokenizer.advance()
       self.compile_term()
     self.add_end_tag('expression')
@@ -242,7 +242,7 @@ class CompilationEngine:
     self.add_start_tag('term')
     if self.token_type in [LexicalLabels.IDENTIFIER, LexicalLabels.INT_CONST, LexicalLabels.STR_CONST, LexicalLabels.KEYWORD]:
       token = self.current_token[1:-1] if self.token_type == LexicalLabels.STR_CONST else self.current_token
-      self.buffer += [f'<{self.token_type}> {token} </{self.token_type}>']
+      self.buffer.append(f'<{self.token_type}> {token} </{self.token_type}>')
       self.tokenizer.advance()
       if self.current_token == '[':
         self.process_token('[')
@@ -264,7 +264,7 @@ class CompilationEngine:
       self.compile_expression()
       self.process_token(')')
     elif self.current_token in ['-', '~']:
-      self.buffer += [f'<symbol> {self.current_token} </symbol>']
+      self.buffer.append(f'<symbol> {self.current_token} </symbol>')
       self.tokenizer.advance()
       self.compile_term()
     else:
