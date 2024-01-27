@@ -1,5 +1,5 @@
 tools/
-projects/[1-9][1-9]
+projects/[1-9][2-9]
 projects/0[9-9]
 *.cmp
 *.out
@@ -13,3 +13,4 @@ max/
 pong/
 rect/
 *.html
+*.vscode
