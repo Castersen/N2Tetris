@@ -13,9 +13,20 @@ ARRAY = 'Array'
 MAIN = 'main'
 NEW = 'new'
 POINTER = 'pointer'
-MEMORY = 'Memory.alloc'
+MEMORY_ALLOC = 'Memory.alloc'
 METHOD = 'method'
 CONSTRUCTOR = 'constructor'
+FUNCTION = 'function'
+STATIC = 'static'
+FIELD = 'field'
+INT = 'int'
+CHAR = 'char'
+BOOLEAN = 'boolean'
+VOID = 'void'
+THIS = 'this'
+TRUE = 'true'
+FALSE = 'false'
+NULL = 'null'
 
 FIELD_CONV = {'field': 'this'}
 
@@ -89,7 +100,7 @@ class SymbolTable:
 
   def add(self, name: str, type_of: str, kind: str):
     index = self.__kind_lookup(kind)
-    if kind == 'field': self.num_of_fields += 1
+    if kind == FIELD: self.num_of_fields += 1
     self.symbol_table[name] = SymbolData(type_of, kind, index)
 
   def __kind_lookup(self, kind: str) -> int:
@@ -200,16 +211,16 @@ class CompilationEngine:
     self.class_name = self.current_token
     self.__process_type(LexicalLabels.IDENTIFIER)
     self.__process_token('{')
-    while self.current_token in ['static', 'field']:
+    while self.current_token in [STATIC, FIELD]:
       self.__compile_class_var_dec()
-    while self.current_token in ['constructor', 'function', 'method']:
+    while self.current_token in [VOID, FUNCTION, METHOD]:
       self.sst.reset()
       self.__compile_subroutine_dec()
     self.__process_token('}')
 
   def __compile_class_var_dec(self):
-    s_kind = self.__process_st_kind('static') if self.current_token == 'static' else self.__process_st_kind('field')
-    s_type = self.__process_st_type(['int', 'char', 'boolean'], LexicalLabels.IDENTIFIER)
+    s_kind = self.__process_st_kind(STATIC) if self.current_token == STATIC else self.__process_st_kind(FIELD)
+    s_type = self.__process_st_type([INT, CHAR, BOOLEAN], LexicalLabels.IDENTIFIER)
     s_name = self.__process_st_name(LexicalLabels.IDENTIFIER)
     self.cst.add(s_name, s_type, s_kind)
     while self.current_token != ';':
@@ -220,10 +231,10 @@ class CompilationEngine:
 
   def __compile_subroutine_dec(self):
     fn_type = self.current_token
-    self.__process_list(['constructor', 'function', 'method'])
-    self.__process_list(['int', 'char', 'boolean', 'void'], LexicalLabels.IDENTIFIER)
+    self.__process_list([VOID, FUNCTION, METHOD])
+    self.__process_list([INT, CHAR, BOOLEAN, VOID], LexicalLabels.IDENTIFIER)
     fn_name = self.current_token
-    if fn_name == MAIN or fn_type == METHOD: self.sst.add('this', self.class_name, ARGUMENT)
+    if fn_name == MAIN or fn_type == METHOD: self.sst.add(THIS, self.class_name, ARGUMENT)
     self.__process_type(LexicalLabels.IDENTIFIER)
     self.__process_token('(')
     self.__compile_parameter_list()
@@ -232,13 +243,13 @@ class CompilationEngine:
 
   def __compile_parameter_list(self):
     if self.current_token != ')':
-      s_type = self.__process_st_type(['int', 'char', 'boolean'], LexicalLabels.IDENTIFIER)
+      s_type = self.__process_st_type([INT, CHAR, BOOLEAN], LexicalLabels.IDENTIFIER)
       s_name = self.__process_st_name(LexicalLabels.IDENTIFIER)
       s_kind = ARGUMENT
       self.sst.add(s_name, s_type, s_kind)
       while self.current_token == ',':
         self.__process_token(',')
-        s_type = self.__process_st_type(['int', 'char', 'boolean'], LexicalLabels.IDENTIFIER)
+        s_type = self.__process_st_type([INT, CHAR, BOOLEAN], LexicalLabels.IDENTIFIER)
         s_name = self.__process_st_name(LexicalLabels.IDENTIFIER)
         self.sst.add(s_name, s_type, s_kind)
 
@@ -250,7 +261,7 @@ class CompilationEngine:
     self.__write_function(self.class_name + '.' + fn_name, n_vars)
     if fn_type == CONSTRUCTOR:
       self.__write_push(CONSTANT, self.cst.num_of_fields)
-      self.__write_call(MEMORY, 1)
+      self.__write_call(MEMORY_ALLOC, 1)
       self.__write_pop(POINTER, 0)
     if fn_type == METHOD:
       self.__write_push(ARGUMENT, 0)
@@ -261,7 +272,7 @@ class CompilationEngine:
   def __compile_var_dec(self) -> int:
     self.__process_token('var')
     n_vars = 1
-    s_type = self.__process_st_type(['int', 'char', 'boolean'], LexicalLabels.IDENTIFIER)
+    s_type = self.__process_st_type([INT, CHAR, BOOLEAN], LexicalLabels.IDENTIFIER)
     s_name = self.__process_st_name(LexicalLabels.IDENTIFIER)
     s_kind = LOCAL
     self.sst.add(s_name, s_type, s_kind)
@@ -368,9 +379,9 @@ class CompilationEngine:
       self.__write_arithmetic(op)
 
   def __compile_term(self):
-    if self.current_token in ['true', 'false', 'null', 'this']:
+    if self.current_token in [TRUE, FALSE, NULL, THIS]:
       self.__write_push(CONST_CONV[self.current_token], INDEX_CONV[self.current_token])
-      if self.current_token == 'true': self.__write_arithmetic('neg')
+      if self.current_token == TRUE: self.__write_arithmetic('neg')
       self.tokenizer.advance()
     elif self.__is_in_symbol_table(self.current_token):
       symbol = self.__lookup(self.current_token)
